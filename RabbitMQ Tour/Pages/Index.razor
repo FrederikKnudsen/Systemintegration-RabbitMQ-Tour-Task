@@ -1,0 +1,64 @@
+﻿@page "/"
+@using Services;
+@inject RabbitMQService rabbitMQService
+
+
+<form>
+    <div class="border border-success w-50" style="min-width: 400px;">
+        <div class="justify-content-center p-2">
+            <h1><b>Tour Selection</b></h1>
+            <br />
+            <div class="form-group">
+                <h5><b>Name</b></h5>
+                <input type="text" class="form-control" @bind-value="tourSelectionModel.Name">
+            </div>
+
+            <div class="form-group">
+                <h5><b>Email</b></h5>
+                <input type="text" class="form-control" @bind-value="tourSelectionModel.Email">
+            </div>
+
+            <div class="form-group w-50">
+                <h5><b>Tours</b></h5>
+                <select class="form-control" @bind="tourSelectionModel.Tour">
+                    <option value="" disabled selected>Choose one</option>
+                    <option value="København">København</option>
+                    <option value="Herning">Herning</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <div class="form-inline">
+                    <input type="radio" name="booking" class="form-check-input" @onclick="(() => tourSelectionModel.Book = true)" />
+                    <label class="form-check-label">Book</label>
+                    <input type="radio" name="booking" class="form-check-input ml-2" @onclick="(() => tourSelectionModel.Book = false)" />
+                    <label class="form-check-label">Cancel</label>
+                </div>
+                <button @onclick="SubmitForm" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@code{
+    public TourSelectionModel tourSelectionModel;
+
+    protected override void OnInitialized()
+    {
+        tourSelectionModel = new TourSelectionModel();
+    }
+
+    void SubmitForm()
+    {
+        rabbitMQService.SendEvent(tourSelectionModel);
+    }
+
+    public class TourSelectionModel
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Tour { get; set; }
+        public bool Book { get; set; }
+    }
+}
